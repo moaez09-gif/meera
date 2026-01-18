@@ -3,9 +3,15 @@ import React, { useState } from 'react';
 import { PIZZA_PRODUCTS } from '../constants';
 import { Product, CartItem } from '../types';
 
-const Menu: React.FC = () => {
-  const [cart, setCart] = useState<CartItem[]>([]);
+interface MenuProps {
+  cart: CartItem[];
+  onAddToCart: (product: Product, size: 'small' | 'med' | 'large') => void;
+  onUpdateQuantity: (productId: string, size: string, delta: number) => void;
+  onRemoveItem: (productId: string, size: string) => void;
+  onNavigateCart: () => void;
+}
 
+const Menu: React.FC<MenuProps> = ({ cart, onAddToCart, onUpdateQuantity, onRemoveItem, onNavigateCart }) => {
   const [selectedSizes, setSelectedSizes] = useState<Record<string, 'small' | 'med' | 'large'>>(
     PIZZA_PRODUCTS.reduce((acc, p) => ({ ...acc, [p.id]: 'small' }), {})
   );
@@ -14,39 +20,6 @@ const Menu: React.FC = () => {
 
   const handleSizeChange = (productId: string, size: 'small' | 'med' | 'large') => {
     setSelectedSizes(prev => ({ ...prev, [productId]: size }));
-  };
-
-  const addToCart = (product: Product) => {
-    const size = selectedSizes[product.id];
-    const price = product.prices[size];
-    
-    setCart(prev => {
-      const existing = prev.find(item => item.productId === product.id && item.selectedSize === size);
-      if (existing) {
-        return prev.map(item => item === existing ? { ...item, quantity: item.quantity + 1 } : item);
-      }
-      return [...prev, {
-        productId: product.id,
-        quantity: 1,
-        selectedSize: size,
-        name: product.name.toUpperCase(),
-        price,
-        image: product.image
-      }];
-    });
-  };
-
-  const removeItem = (productId: string, size: string) => {
-    setCart(prev => prev.filter(item => !(item.productId === productId && item.selectedSize === size)));
-  };
-
-  const updateQuantity = (productId: string, size: string, delta: number) => {
-    setCart(prev => prev.map(item => {
-      if (item.productId === productId && item.selectedSize === size) {
-        return { ...item, quantity: Math.max(1, item.quantity + delta) };
-      }
-      return item;
-    }));
   };
 
   const categories = {
@@ -59,25 +32,27 @@ const Menu: React.FC = () => {
     <div className="max-w-[1440px] mx-auto px-6 py-8 flex gap-8">
       {/* Sidebar Cart */}
       <aside className="hidden lg:flex flex-col w-80 shrink-0 gap-6 sticky top-24 self-start h-[calc(100vh-120px)]">
-        <div className="bg-white dark:bg-[#2d1b16] rounded-xl p-6 shadow-sm border border-[#f4eae7] dark:border-[#3d2a24] flex flex-col h-full">
+        <div className="bg-white dark:bg-[#2d1b16] rounded-xl p-6 shadow-sm border border-[#f4eae7] dark:border-[#3d2a24] flex flex-col h-full overflow-hidden">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-lg font-bold">Your Order</h2>
               <p className="text-xs text-[#9c5e49] dark:text-[#b08b7e]">{cart.length} item{cart.length !== 1 ? 's' : ''} selected</p>
             </div>
-            <span className="material-symbols-outlined text-primary">shopping_basket</span>
+            <button onClick={onNavigateCart} className="text-primary hover:scale-110 transition-transform">
+              <span className="material-symbols-outlined">open_in_full</span>
+            </button>
           </div>
           
           <div className="flex-1 overflow-y-auto flex flex-col gap-4 no-scrollbar">
-            {cart.map((item, idx) => (
-              <div key={`${item.productId}-${item.selectedSize}`} className="flex gap-3 animate-fade-in group/item">
+            {cart.map((item) => (
+              <div key={`${item.productId}-${item.selectedSize}`} className="flex gap-3 animate-fade-in group/item border-b border-black/5 dark:border-white/5 pb-4 last:border-0">
                 <div className="w-14 h-14 rounded-lg bg-cover bg-center shrink-0" style={{ backgroundImage: `url('${item.image}')` }}></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
                     <p className="text-sm font-bold truncate">{item.name}</p>
                     <button 
-                      onClick={() => removeItem(item.productId, item.selectedSize)}
-                      className="opacity-0 group-hover/item:opacity-100 transition-opacity text-red-500 hover:bg-red-50 p-0.5 rounded"
+                      onClick={() => onRemoveItem(item.productId, item.selectedSize)}
+                      className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-1 rounded-md transition-all active:scale-75"
                     >
                       <span className="material-symbols-outlined text-sm">delete</span>
                     </button>
@@ -85,14 +60,14 @@ const Menu: React.FC = () => {
                   <p className="text-xs text-[#9c5e49]">{item.selectedSize.charAt(0).toUpperCase() + item.selectedSize.slice(1)} • TZS {item.price.toLocaleString()}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <button 
-                      onClick={() => updateQuantity(item.productId, item.selectedSize, -1)}
+                      onClick={() => onUpdateQuantity(item.productId, item.selectedSize, -1)}
                       className="text-primary hover:bg-primary/10 rounded p-0.5 transition-colors"
                     >
                       <span className="material-symbols-outlined text-base">remove_circle</span>
                     </button>
                     <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
                     <button 
-                      onClick={() => updateQuantity(item.productId, item.selectedSize, 1)}
+                      onClick={() => onUpdateQuantity(item.productId, item.selectedSize, 1)}
                       className="text-primary hover:bg-primary/10 rounded p-0.5 transition-colors"
                     >
                       <span className="material-symbols-outlined text-base">add_circle</span>
@@ -115,11 +90,11 @@ const Menu: React.FC = () => {
               <span className="font-bold">TZS {subtotal.toLocaleString()}</span>
             </div>
             <button 
-              onClick={() => window.open('https://wa.me/255670621947', '_blank')}
+              onClick={onNavigateCart}
               disabled={cart.length === 0}
-              className="w-full bg-primary text-white py-4 rounded-xl font-bold text-sm shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:translate-y-0"
+              className="w-full bg-primary text-white py-4 rounded-xl font-bold text-sm shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
             >
-              Order via WhatsApp • TZS {subtotal.toLocaleString()}
+              Go to Cart
             </button>
           </div>
         </div>
@@ -144,7 +119,7 @@ const Menu: React.FC = () => {
                   <ProductCard 
                     key={product.id} 
                     product={product} 
-                    onAdd={addToCart} 
+                    onAdd={(p) => onAddToCart(p, selectedSizes[p.id])} 
                     selectedSize={selectedSizes[product.id]}
                     onSizeChange={(s) => handleSizeChange(product.id, s)}
                   />
@@ -167,10 +142,10 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, selectedSize, onSizeChange }) => {
   return (
-    <div className="bg-white dark:bg-[#2d1b16] rounded-2xl overflow-hidden border border-[#f4eae7] dark:border-[#3d2a24] hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-300 flex flex-col group">
+    <div className="bg-white dark:bg-[#2d1b16] rounded-2xl overflow-hidden border border-[#f4eae7] dark:border-[#3d2a24] hover:shadow-2xl hover:translate-y-[-8px] transition-all duration-500 flex flex-col group animate-fade-in">
       <div className="relative h-56 w-full overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style={{ backgroundImage: `url('${product.image}')` }}></div>
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
+        <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" style={{ backgroundImage: `url('${product.image}')` }}></div>
+        <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {product.isPopular && (
             <span className="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg w-fit">Best Seller</span>
           )}
@@ -182,7 +157,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, selectedSize,
         </div>
       </div>
       <div className="p-6 flex flex-col flex-1">
-        <h3 className="text-xl font-extrabold mb-2 uppercase font-display group-hover:text-primary transition-colors">{product.name}</h3>
+        <h3 className="text-xl font-extrabold mb-2 uppercase font-display group-hover:text-primary transition-colors duration-300">{product.name}</h3>
         <p className="text-sm text-[#9c5e49] dark:text-[#b08b7e] mb-6 flex-1 italic">{product.description}</p>
         
         <div className="space-y-4">
@@ -196,8 +171,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, selectedSize,
                   checked={selectedSize === size}
                   onChange={() => onSizeChange(size)}
                 />
-                <div className="text-center py-2 rounded-lg border border-[#f4eae7] dark:border-[#3d2a24] peer-checked:bg-primary/10 peer-checked:border-primary transition-all hover:bg-gray-50 dark:hover:bg-white/5">
-                  <p className="text-[10px] uppercase font-bold text-[#9c5e49]">{size.slice(0, 3)}</p>
+                <div className="text-center py-2 rounded-lg border border-[#f4eae7] dark:border-[#3d2a24] peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-all hover:bg-gray-50 dark:hover:bg-white/5 active:scale-90">
+                  <p className="text-[10px] uppercase font-bold opacity-60 peer-checked:opacity-100">{size.slice(0, 3)}</p>
                   <p className="text-xs font-black">{(product.prices[size] / 1000).toFixed(0)},000</p>
                 </div>
               </label>
@@ -205,9 +180,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, selectedSize,
           </div>
           <button 
             onClick={() => onAdd(product)}
-            className="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/10"
+            className="w-full bg-primary text-white py-3 rounded-xl font-bold text-sm hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/10 hover:shadow-primary/30"
           >
-            <span className="material-symbols-outlined text-lg">shopping_cart</span>
+            <span className="material-symbols-outlined text-lg">add_shopping_cart</span>
             Add to Order
           </button>
         </div>

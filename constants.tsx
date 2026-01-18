@@ -30,28 +30,28 @@ export const PIZZA_PRODUCTS: Product[] = [
     isPopular: true
   },
   {
-    id: 's1',
+    id: 'sauce1',
     name: 'Garlic Sauce',
-    description: 'Creamy roasted garlic dip with fresh herbs.',
+    description: 'Our house-made creamy garlic butter dip with aromatic herbs.',
     prices: { small: 2000, med: 3500, large: 5000 },
-    image: 'https://images.unsplash.com/photo-1541530232473-b3286431526d?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1541530232473-b3286431526d?auto=format&fit=crop&q=80&w=400',
     category: 'sides'
   },
   {
-    id: 's2',
+    id: 'sauce2',
     name: 'Peri-Peri Sauce',
-    description: 'Flaming hot African bird\'s eye chili sauce.',
+    description: 'Spicy African bird\'s eye chili sauce for a fiery kick.',
     prices: { small: 2000, med: 3500, large: 5000 },
-    image: 'https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1594911772125-07fc7a2d8d9f?auto=format&fit=crop&q=80&w=400',
     category: 'sides',
     isSpicy: true
   },
   {
-    id: 's3',
+    id: 'sauce3',
     name: 'Green Sauce',
-    description: 'Zesty cilantro and jalapeño herb blend.',
+    description: 'Zesty cilantro, lime, and jalapeño herb blend.',
     prices: { small: 2000, med: 3500, large: 5000 },
-    image: 'https://images.unsplash.com/photo-1470333732907-05ccc2abc0c8?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1470333732907-05ccc2abc0c8?auto=format&fit=crop&q=80&w=400',
     category: 'sides'
   }
 ];

@@ -52,36 +52,6 @@ const About: React.FC<AboutProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* Timeline Section */}
-      <section className="max-w-[1200px] mx-auto px-6 lg:px-20 py-20">
-        <h2 className="text-slate-900 dark:text-white text-3xl font-black leading-tight mb-12 text-center uppercase tracking-wider font-display">The Heritage Journey</h2>
-        <div className="flex flex-col max-w-3xl mx-auto">
-          <div className="grid grid-cols-[48px_1fr] gap-x-6">
-            <div className="flex flex-col items-center gap-2 pt-3">
-              <div className="text-primary bg-primary/10 p-2 rounded-full">
-                <span className="material-symbols-outlined text-2xl">local_fire_department</span>
-              </div>
-              <div className="w-1 bg-primary/20 h-24 grow rounded-full"></div>
-            </div>
-            <div className="flex flex-col py-3">
-              <span className="text-primary font-bold text-sm mb-1">2010</span>
-              <p className="text-slate-900 dark:text-white text-xl font-bold font-display">The First Spark</p>
-              <p className="text-slate-600 dark:text-[#baa39c] text-base leading-relaxed mt-2">Founded as a small pop-up in Dar Es Salaam, driven by a dream of the perfect crust.</p>
-            </div>
-            <div className="flex flex-col items-center gap-2 pb-3">
-              <div className="text-primary bg-primary/10 p-2 rounded-full">
-                <span className="material-symbols-outlined text-2xl">trophy</span>
-              </div>
-            </div>
-            <div className="flex flex-col py-3">
-              <span className="text-primary font-bold text-sm mb-1">2024</span>
-              <p className="text-slate-900 dark:text-white text-xl font-bold font-display">Meera Today</p>
-              <p className="text-slate-600 dark:text-[#baa39c] text-base leading-relaxed mt-2">Named 'Pizzeria of the Year' and serving thousands of happy guests.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Meet the Chefs */}
       <section className="bg-slate-100 dark:bg-[#1f1715] py-20 px-6 lg:px-20">
         <div className="max-w-[1200px] mx-auto text-center mb-16">
@@ -91,7 +61,7 @@ const About: React.FC<AboutProps> = ({ onNavigate }) => {
         <div className="max-w-[1000px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           <div className="flex flex-col items-center group">
             <div className="size-48 rounded-full bg-cover bg-center border-4 border-primary/20 mb-6 group-hover:border-primary transition-all duration-300 overflow-hidden shadow-lg" 
-                 style={{ backgroundImage: `url("https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=800&auto=format&fit=crop")` }}></div>
+                 style={{ backgroundImage: `url("https://images.unsplash.com/photo-1574966740702-8692510b642e?auto=format&fit=crop&q=80&w=400")` }}></div>
             <h3 className="text-slate-900 dark:text-white text-xl font-bold font-display">Chef Bakari</h3>
             <span className="text-primary text-sm font-semibold mb-3">Head Chef</span>
             <p className="text-slate-600 dark:text-[#baa39c] text-sm text-center">Bringing local spice and international technique to every pie.</p>

@@ -2,11 +2,12 @@
 import React from 'react';
 
 interface NavigationProps {
-  currentView: 'home' | 'menu' | 'rewards' | 'about';
-  onNavigate: (view: 'home' | 'menu' | 'rewards' | 'about') => void;
+  currentView: 'home' | 'menu' | 'rewards' | 'about' | 'cart';
+  onNavigate: (view: 'home' | 'menu' | 'rewards' | 'about' | 'cart') => void;
+  cartCount: number;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate }) => {
+const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate, cartCount }) => {
   return (
     <header className="sticky top-0 z-50 w-full bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-[#f4eae7] dark:border-[#3d2a24]">
       <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -49,10 +50,22 @@ const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate }) => {
           </nav>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button 
+            onClick={() => onNavigate('cart')}
+            className="relative flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all active:scale-90"
+            aria-label="View Cart"
+          >
+            <span className="material-symbols-outlined">shopping_cart</span>
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white border-2 border-background-light dark:border-background-dark animate-bounce">
+                {cartCount}
+              </span>
+            )}
+          </button>
           <button 
             onClick={() => window.open('https://wa.me/255670621947', '_blank')}
-            className="flex min-w-[140px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-primary text-white text-sm font-bold hover:brightness-110 hover:scale-105 transition-all shadow-sm active:scale-95"
+            className="flex min-w-[100px] sm:min-w-[140px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 sm:px-6 bg-primary text-white text-xs sm:text-sm font-bold hover:brightness-110 hover:scale-105 transition-all shadow-sm active:scale-95"
           >
             Order Now
           </button>

@@ -6,17 +6,56 @@ import SpecialOffers from './components/SpecialOffers';
 import Menu from './components/Menu';
 import Rewards from './components/Rewards';
 import About from './components/About';
+import CartView from './components/CartView';
 import Footer from './components/Footer';
 import { PIZZA_PRODUCTS } from './constants';
+import { CartItem, Product } from './types';
 
 const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'home' | 'menu' | 'rewards' | 'about'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'menu' | 'rewards' | 'about' | 'cart'>('home');
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const bestSellers = PIZZA_PRODUCTS.filter(p => p.isPopular);
+  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+  const addToCart = (product: Product, size: 'small' | 'med' | 'large') => {
+    const price = product.prices[size];
+    setCart(prev => {
+      const existing = prev.find(item => item.productId === product.id && item.selectedSize === size);
+      if (existing) {
+        return prev.map(item => item === existing ? { ...item, quantity: item.quantity + 1 } : item);
+      }
+      return [...prev, {
+        productId: product.id,
+        quantity: 1,
+        selectedSize: size,
+        name: product.name.toUpperCase(),
+        price,
+        image: product.image
+      }];
+    });
+  };
+
+  const updateQuantity = (productId: string, size: string, delta: number) => {
+    setCart(prev => prev.map(item => {
+      if (item.productId === productId && item.selectedSize === size) {
+        return { ...item, quantity: Math.max(1, item.quantity + delta) };
+      }
+      return item;
+    }));
+  };
+
+  const removeItem = (productId: string, size: string) => {
+    setCart(prev => prev.filter(item => !(item.productId === productId && item.selectedSize === size)));
+  };
 
   return (
     <div className="min-h-screen">
-      <Navigation currentView={currentView} onNavigate={setCurrentView} />
+      <Navigation 
+        currentView={currentView} 
+        onNavigate={setCurrentView} 
+        cartCount={cartCount}
+      />
       
       <main className="animate-fade-in min-h-[calc(100vh-64px)]">
         {currentView === 'home' && (
@@ -74,9 +113,28 @@ const App: React.FC = () => {
             </section>
           </>
         )}
-        {currentView === 'menu' && <Menu />}
+        
+        {currentView === 'menu' && (
+          <Menu 
+            cart={cart}
+            onAddToCart={addToCart}
+            onUpdateQuantity={updateQuantity}
+            onRemoveItem={removeItem}
+            onNavigateCart={() => setCurrentView('cart')}
+          />
+        )}
+        
         {currentView === 'rewards' && <Rewards onNavigate={setCurrentView} />}
         {currentView === 'about' && <About onNavigate={setCurrentView} />}
+        
+        {currentView === 'cart' && (
+          <CartView 
+            cart={cart}
+            onUpdateQuantity={updateQuantity}
+            onRemoveItem={removeItem}
+            onNavigate={setCurrentView}
+          />
+        )}
       </main>
       
       <Footer />
