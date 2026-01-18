@@ -38,13 +38,9 @@ const CartView: React.FC<CartViewProps> = ({ cart, onUpdateQuantity, onRemoveIte
       message += `${index + 1}. *${item.name}*\n`;
       message += `   Size: ${item.selectedSize.toUpperCase()}\n`;
       message += `   Qty: ${item.quantity}\n`;
-      message += `   Price: TZS ${(item.price * item.quantity).toLocaleString()}\n\n`;
     });
 
     message += `--------------------------\n`;
-    message += `*Subtotal:* TZS ${subtotal.toLocaleString()}\n`;
-    message += `*Delivery:* TZS ${deliveryFee.toLocaleString()}\n`;
-    message += `*Total Amount:* TZS ${total.toLocaleString()}\n\n`;
     message += `_Please confirm my order._`;
 
     const encodedMessage = encodeURIComponent(message);
