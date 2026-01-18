@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PIZZA_PRODUCTS } from '../constants';
 import { Product, CartItem } from '../types';
 
@@ -10,6 +10,35 @@ interface MenuProps {
   onRemoveItem: (productId: string, size: string) => void;
   onNavigateCart: () => void;
 }
+
+const LazyImage: React.FC<{ src: string; alt: string; className?: string }> = ({ src, alt, className }) => {
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setLoaded(true);
+    }
+  }, []);
+
+  return (
+    <div className={`relative overflow-hidden bg-black/5 dark:bg-white/5 ${className}`}>
+      {!loaded && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        onLoad={() => setLoaded(true)}
+        className={`w-full h-full object-cover transition-all duration-700 ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
+        loading="lazy"
+      />
+    </div>
+  );
+};
 
 const Menu: React.FC<MenuProps> = ({ cart, onAddToCart, onUpdateQuantity, onRemoveItem, onNavigateCart }) => {
   const [selectedSizes, setSelectedSizes] = useState<Record<string, 'small' | 'med' | 'large'>>(
@@ -45,8 +74,10 @@ const Menu: React.FC<MenuProps> = ({ cart, onAddToCart, onUpdateQuantity, onRemo
           
           <div className="flex-1 overflow-y-auto flex flex-col gap-4 no-scrollbar">
             {cart.map((item) => (
-              <div key={`${item.productId}-${item.selectedSize}`} className="flex gap-3 animate-fade-in group/item border-b border-black/5 dark:border-white/5 pb-4 last:border-0">
-                <div className="w-14 h-14 rounded-lg bg-cover bg-center shrink-0" style={{ backgroundImage: `url('${item.image}')` }}></div>
+              <div key={`${item.productId}-${item.selectedSize}`} className="flex gap-3 animate-reveal group/item border-b border-black/5 dark:border-white/5 pb-4 last:border-0">
+                <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0">
+                   <LazyImage src={item.image} alt={item.name} className="w-full h-full" />
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
                     <p className="text-sm font-bold truncate">{item.name}</p>
@@ -142,9 +173,9 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd, selectedSize, onSizeChange }) => {
   return (
-    <div className="bg-white dark:bg-[#2d1b16] rounded-2xl overflow-hidden border border-[#f4eae7] dark:border-[#3d2a24] hover:shadow-2xl hover:translate-y-[-8px] transition-all duration-500 flex flex-col group animate-fade-in">
+    <div className="bg-white dark:bg-[#2d1b16] rounded-2xl overflow-hidden border border-[#f4eae7] dark:border-[#3d2a24] hover:shadow-2xl hover:translate-y-[-8px] transition-all duration-500 flex flex-col group animate-reveal">
       <div className="relative h-56 w-full overflow-hidden">
-        <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" style={{ backgroundImage: `url('${product.image}')` }}></div>
+        <LazyImage src={product.image} alt={product.name} className="w-full h-full" />
         <div className="absolute top-4 left-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {product.isPopular && (
             <span className="bg-primary text-white text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg w-fit">Best Seller</span>
